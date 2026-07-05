@@ -1,0 +1,6 @@
+{
+  "name": "Agentic AI Email Reply Generator",
+  "description": "An agentic AI-powered email analysis and reply generation assistant with specialized intent detection and style-specific replies.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

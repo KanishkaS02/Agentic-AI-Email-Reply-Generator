@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic AI Email Reply Generator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#1e293b',
+                            950: '#0f172a',
+                        },
+                        indigo: {
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        },
+                        violet: {
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+                        'glow': '0 0 20px rgba(99, 102, 241, 0.15)',
+                        'glow-heavy': '0 0 30px rgba(99, 102, 241, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#0a0a1a] text-slate-100 font-sans antialiased selection:bg-indigo-500/30 selection:text-indigo-200 min-h-screen relative overflow-x-hidden flex flex-col">
+    
+    <!-- Animated Mesh Background Elements -->
+    <div class="absolute -top-24 -left-24 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute top-1/2 -right-48 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none"></div>
+    <div class="absolute -bottom-24 left-1/3 w-80 h-80 bg-blue-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-12 opacity-0 transition-all duration-300 pointer-events-none bg-slate-950/90 backdrop-blur-md border border-white/10 text-emerald-400 px-4 py-3 rounded-xl shadow-glass flex items-center gap-2">
+        <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+        <span id="toast-text" class="text-sm font-medium">Copied to clipboard!</span>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 py-8 md:py-12 flex flex-col min-h-screen relative z-10 w-full">
+        
+        <!-- Header -->
+        <header class="mb-10 text-center relative" id="app-header">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md text-slate-300 text-xs font-semibold tracking-wider uppercase mb-3 animate-pulse">
+                <i data-lucide="bot" class="w-4 h-4 text-indigo-400"></i> Gemini 2.5 Flash Active
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent mb-3">
+                Agentic Reply <span class="font-light italic">Gen</span>
+            </h1>
+            <p class="text-sm md:text-base text-slate-400 max-w-xl mx-auto font-light">
+                Analyze and generate contextual, professional replies using an agentic chain: **Intent Detection** paired with **Precision Copywriting**.
+            </p>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-grow">
+            
+            <!-- Left Side: Input & Settings (7 Cols) -->
+            <section class="lg:col-span-7 space-y-6">
+                <!-- Card Container -->
+                <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden transition-all duration-300 hover:border-white/20" id="input-card">
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <label for="email-input" class="text-xs font-semibold tracking-widest text-slate-400 uppercase flex items-center gap-2">
+                            <i data-lucide="mail" class="w-4 h-4 text-indigo-400"></i> Inbound Message
+                        </label>
+                        <button id="clear-btn" class="text-xs text-slate-500 hover:text-slate-300 flex items-center gap-1 transition-colors duration-200">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear
+                        </button>
+                    </div>
+
+                    <!-- Text Area wrapper -->
+                    <div class="relative group">
+                        <textarea id="email-input" rows="8" 
+                            class="w-full bg-black/20 border border-white/5 focus:border-white/10 focus:ring-0 rounded-2xl p-4 text-slate-200 placeholder-slate-600 resize-none font-sans text-sm md:text-base leading-relaxed"
+                            placeholder="Paste the email content here..."></textarea>
+                    </div>
+
+                    <!-- Grid of options and triggers -->
+                    <div class="mt-6 space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Reply Style selector -->
+                            <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4">
+                                <label for="reply-style" class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">
+                                    Reply Style
+                                </label>
+                                <div class="relative">
+                                    <select id="reply-style" class="w-full bg-transparent border-none text-slate-200 focus:ring-0 text-sm p-0 appearance-none cursor-pointer">
+                                        <option value="Formal">Formal & Professional</option>
+                                        <option value="Friendly">Warm & Friendly</option>
+                                        <option value="Short">Short & Direct</option>
+                                        <option value="Detailed">Comprehensive & Detailed</option>
+                                        <option value="Apologetic">Sincere & Apologetic</option>
+                                        <option value="Confident">Bold & Confident</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center text-slate-500">
+                                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Templates / Presets -->
+                            <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">
+                                    Load Sample Email
+                                </label>
+                                <div class="relative">
+                                    <select id="sample-emails" class="w-full bg-transparent border-none text-slate-400 focus:ring-0 text-sm p-0 appearance-none cursor-pointer">
+                                        <option value="" disabled selected>Select a preset...</option>
+                                        <option value="interview">Interview Schedule Request</option>
+                                        <option value="complaint">Angry Customer Complaint</option>
+                                        <option value="meeting">Project Alignment Meeting</option>
+                                        <option value="payment">Overdue Invoice Payment</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center text-slate-500">
+                                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Button Section -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <!-- Button 1: Analyze -->
+                            <button id="analyze-btn" class="relative group overflow-hidden bg-white/5 border border-white/10 text-slate-300 py-3.5 px-6 rounded-2xl font-semibold text-sm transition-all duration-300 hover:bg-white/10 hover:border-white/20 flex items-center justify-center gap-2 shadow-lg">
+                                <span class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                                <i data-lucide="search-code" class="w-4 h-4 text-indigo-400"></i>
+                                <span>Analyze Email</span>
+                            </button>
+
+                            <!-- Button 2: Generate Reply -->
+                            <button id="reply-btn" class="relative group overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white py-3.5 px-6 rounded-2xl font-bold text-sm transition-all duration-300 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                                <span class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                                <i data-lucide="sparkles" class="w-4 h-4 animate-bounce"></i>
+                                <span>Generate Reply</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error panel -->
+                <div id="error-card" class="hidden bg-rose-950/20 border border-rose-500/20 text-rose-300 rounded-2xl p-4 flex items-start gap-3 transition-all duration-300 animate-fadeIn">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-400 mt-0.5 flex-shrink-0"></i>
+                    <div>
+                        <h4 class="font-semibold text-sm text-rose-200">Operation Failed</h4>
+                        <p id="error-text" class="text-xs text-rose-300/90 mt-1 leading-relaxed">Failed to generate response. Please verify your Gemini API configuration and try again.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Side: Agent Output & Results (5 Cols) -->
+            <section class="lg:col-span-5 space-y-6">
+                
+                <!-- Loading State (Conditional Overlay) -->
+                <div id="loading-state" class="hidden flex-col items-center justify-center bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-10 h-72 text-center animate-fadeIn">
+                    <div class="relative w-16 h-16 mb-4">
+                        <div class="absolute inset-0 border-4 border-indigo-500/20 rounded-full"></div>
+                        <div class="absolute inset-0 border-4 border-t-indigo-500 border-r-indigo-500/50 rounded-full animate-spin"></div>
+                    </div>
+                    <h3 id="loading-title" class="font-bold text-lg text-slate-100">Agent Processing</h3>
+                    <p id="loading-desc" class="text-xs text-slate-400 mt-1.5 max-w-xs mx-auto">Evaluating email content patterns & determining communication intent...</p>
+                </div>
+
+                <!-- Agent 1: Analysis Card -->
+                <div id="analysis-card" class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl relative overflow-hidden transition-all duration-300 hover:border-white/20 hidden">
+                    <div class="absolute top-0 right-0 bg-indigo-500/20 text-indigo-300 px-3 py-1.5 rounded-bl-xl border-l border-b border-indigo-500/30 text-[10px] font-bold tracking-wider uppercase font-mono">
+                        Agent 1: Analysis Report
+                    </div>
+
+                    <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-1.5">
+                        <i data-lucide="binary" class="w-4 h-4 text-indigo-400"></i> Intent & Metadata Analysis
+                    </h3>
+
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <!-- Intent field -->
+                            <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+                                <span class="text-[10px] text-slate-500 uppercase block mb-1">Detected Intent</span>
+                                <span id="out-intent" class="text-sm font-semibold">Meeting Request</span>
+                            </div>
+
+                            <!-- Priority field -->
+                            <div class="bg-white/5 p-3 rounded-xl border border-white/5 relative overflow-hidden">
+                                <div class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full" id="priority-dot"></div>
+                                <span class="text-[10px] text-slate-500 uppercase block mb-1">Priority Metric</span>
+                                <span id="out-priority" class="text-sm font-semibold">High</span>
+                            </div>
+                        </div>
+
+                        <!-- Tone field -->
+                        <div class="bg-white/5 p-3 rounded-xl border border-white/5 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] text-slate-500 uppercase block mb-0.5">Communication Tone</span>
+                                <span id="out-tone" class="text-sm font-semibold text-indigo-400">Professional</span>
+                            </div>
+                            <div class="text-slate-600" id="tone-icon-container">
+                                <i data-lucide="smile" class="w-5 h-5 text-indigo-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- Summary -->
+                        <div class="bg-white/5 p-4 rounded-xl border border-white/5">
+                            <span class="text-[10px] text-slate-500 uppercase block mb-1">AI Executive Summary</span>
+                            <p id="out-summary" class="text-xs text-slate-300 leading-relaxed italic">
+                                The sender is requesting to reschedule tomorrow's project check-in to an afternoon slot due to a client emergency.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agent 2: Reply Card -->
+                <div id="reply-card" class="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 shadow-2xl relative overflow-hidden transition-all duration-300 hover:border-white/30 hidden">
+                    <div class="absolute top-0 right-0 bg-purple-500/20 text-purple-300 px-3 py-1.5 rounded-bl-xl border-l border-b border-purple-500/30 text-[10px] font-bold tracking-wider uppercase font-mono">
+                        Agent 2: Final Response
+                    </div>
+
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-[0.2em] flex items-center gap-1.5">
+                            <i data-lucide="feather" class="w-4 h-4 text-purple-400"></i> Generated Professional Reply
+                        </h3>
+                        <button id="copy-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 transition-colors text-xs font-medium">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Reply
+                        </button>
+                    </div>
+
+                    <!-- Output message view -->
+                    <div class="p-5 bg-black/20 rounded-2xl border border-white/5 relative min-h-36">
+                        <pre id="out-reply" class="text-xs md:text-sm text-slate-200 leading-relaxed font-mono whitespace-pre-wrap select-all focus:outline-none" contenteditable="true">
+Dear Client,
+
+Thank you for reaching out. I've updated our schedule accordingly.
+
+Best regards,
+Professional Agent
+                        </pre>
+                        <div class="absolute bottom-2 right-2 text-[10px] text-slate-600 font-mono">
+                            Editable
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Help Card -->
+                <div id="info-card" class="bg-white/5 border border-white/10 rounded-3xl p-6 text-center space-y-3">
+                    <i data-lucide="shield-check" class="w-8 h-8 text-indigo-500/40 mx-auto"></i>
+                    <h4 class="font-bold text-slate-300 text-sm">How does the workflow work?</h4>
+                    <p class="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
+                        **Agent 1** reads and categorizes your email's semantics. **Agent 2** ingests that structural analysis with your chosen style, and drafts a precise, custom reply.
+                    </p>
+                </div>
+
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-12 py-6 border-t border-slate-900 text-center text-xs text-slate-600 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                Built as a high-fidelity **Dual-Agentic AI Email Copilot**
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Node / Python Backend Ready</span>
+                <span>Powered by Gemini 2.5 Flash API</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Script Entry -->
+    <script src="script.js"></script>
+</body>
+</html>
