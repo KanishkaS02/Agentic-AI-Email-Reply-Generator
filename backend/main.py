@@ -1,6 +1,9 @@
 """
 FastAPI Backend App for Agentic AI Email Reply Generator
 """
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from pathlib import Path
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,13 +29,7 @@ app.add_middleware(
 analyzer_agent = IntentDetectionAgent()
 writer_agent = ReplyGenerationAgent()
 
-@app.get("/")
-def read_root():
-    return {
-        "status": "online",
-        "service": "Agentic AI Email Reply Generator API",
-        "endpoints": ["/analyze", "/reply"]
-    }
+
 
 @app.post("/analyze", response_model=AnalyzeResponse)
 async def analyze_email(request: AnalyzeRequest):
@@ -84,7 +81,17 @@ async def generate_reply(request: ReplyRequest):
     )
     
     return ReplyResponse(reply=reply_draft)
+# -----------------------------
+# Serve Frontend Files
+# -----------------------------
+BASE_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = BASE_DIR / "frontend"
 
+app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+
+@app.get("/")
+async def serve_frontend():
+    return FileResponse(FRONTEND_DIR / "index.html")
 if __name__ == "__main__":
     # Standard Uvicorn startup
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=8000, reload=True)
